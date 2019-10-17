@@ -29,6 +29,7 @@ import sys #required to cancel script if blocked by Yahoo
 import shutil #required for deletung an old folder
 import glob #required to find the most recent message downloaded
 import time #required to log the date and time of run
+import traceback #required for try-catch
 
 def archive_group(groupName, mode="update"):
 	log("\nArchiving group '" + groupName + "', mode: " + mode + " , on " + time.strftime("%c"), groupName)
@@ -56,6 +57,7 @@ def archive_group(groupName, mode="update"):
 		if os.path.exists(groupName):
 			shutil.rmtree(groupName)
 		min = 1
+		min = 51 # about kurzlist start.
 		
 	else:
 		print ("You have specified an invalid mode (" + mode + ").")
@@ -91,25 +93,36 @@ def group_messages_max(groupName):
 def archive_message(groupName, msgNumber, depth=0):
 	global failed
 	failed = False
-	s = requests.Session()
-	resp = s.get('https://groups.yahoo.com/api/v1/groups/' + groupName + '/messages/' + str(msgNumber) + '/raw', cookies={'T': cookie_T, 'Y': cookie_Y})
-	if resp.status_code != 200:
-		#some other problem, perhaps being refused access by Yahoo?
-		#retry for a max of 3 times anyway
-		if depth < 3:
-			print ("Cannot get message " + str(msgNumber) + ", attempt " + str(depth+1) + " of 3 due to HTTP status code " + str(resp.status_code))
-			time.sleep(0.1)
-			archive_message(groupName,msgNumber,depth+1)
-		else:
-			if resp.status_code == 500:
-				#we are most likely being blocked by Yahoo
-				log("Archive halted - it appears Yahoo has blocked you.", groupName)
-				log("Check if you can access the group's homepage from your browser. If you can't, you have been blocked.", groupName)
-				log("Don't worry, in a few hours (normally less than 3) you'll be unblocked and you can run this script again - it'll continue where you left off." ,groupName)
-				sys.exit()
-			log("Failed to retrive message " + str(msgNumber) + " due to HTTP status code " + str(resp.status_code), groupName )
-			failed = True
-	
+	try:
+		s = requests.Session()
+		resp = s.get('https://groups.yahoo.com/api/v1/groups/' + groupName + '/messages/' + str(msgNumber) + '/raw', cookies={'T': cookie_T, 'Y': cookie_Y})
+		if resp.status_code != 200:
+			#some other problem, perhaps being refused access by Yahoo?
+			#retry for a max of 3 times anyway
+			if depth < 3:
+				print ("Cannot get message " + str(msgNumber) + ", attempt " + str(depth+1) + " of 3 due to HTTP status code " + str(resp.status_code))
+				time.sleep(0.1)
+				archive_message(groupName,msgNumber,depth+1)
+			else:
+				if resp.status_code == 500:
+					#we are most likely being blocked by Yahoo
+					log("Archive halted - it appears Yahoo has blocked you.", groupName)
+					log("Check if you can access the group's homepage from your browser. If you can't, you have been blocked.", groupName)
+					log("Don't worry, in a few hours (normally less than 3) you'll be unblocked and you can run this script again - it'll continue where you left off." ,groupName)
+					sys.exit()
+				log("Failed to retrive message " + str(msgNumber) + " due to HTTP status code " + str(resp.status_code), groupName )
+				failed = True
+	except Exception as err:
+		exc_type, exc_value, exc_tb = sys.exc_info()
+		tbe = traceback.TracebackException(
+			exc_type, exc_value, exc_tb,
+		)
+		print('\nProblem with Connection')
+		print(''.join(tbe.format_exception_only()))
+        print('\nSleeping 5 minutes to sidestep throttling/error')
+		time.sleep(300)
+
+
 	if failed == True:
 		return False
 	
