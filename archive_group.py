@@ -18,8 +18,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-cookie_T = 'COOKIE_T_DATA_GOES_HERE'
-cookie_Y = 'COOKIE_Y_DATA_GOES_HERE'
+cookie_T = 'z=TW7pdBTqiudB4cBr0Zt0H5VMzUxNwYxMk41NTUxNDI-&a=QAE&sk=DAA2ED7H1iDLqk&ks=EAAZwNGMEyedpZ2DmlE2LXYIA--~G&kt=EAAklbGwO1YZCyBwdDT_d6n4w--~I&ku=FAAFEYaCOu.bcDL7pYY8IsQy8oWksQuijgoLOgKqYrIykp1tK7w6u9XZKZW7mizAzbVWkQtc0E_l9oTO7JA2afuULQtAxWV5dKxtPiFYvJTiBNcG.S_HUiBuOEORtl_mNj8ND14mKSRMuC4YHTSkGyYmy6HOAaS3NUtBaxV3OaE4dY-~A&d=bnMBeWFob28BZwFQNTJOVTJNSlRRSEFZT0RXUVo1QUxOQk5UVQFzbAFOREkyTUFFMk5Ua3lNakkyTXpVLQFhAVFBRQFhYwFBSEZoSkVGUQFsYXQBVFc3cGRCAWNzAQFhbAFwbGFuZXR3cml0ZQFzYwFkZXNrdG9wX3dlYgFmcwF4VTNLX2J4ZHA3V1QBenoBVFc3cGRCQTdF&af=JnRzPTE1NzEyNzIwODMmcHM9OFBxdUxROUVNOHQ4ZVFRMXcwRmZkdy0t'
+cookie_Y = 'v=1&n=4f6vvqa63pqrv&l=csuz_3033o/o&p=m2a11l800000000&r=56&intl=us'
 
 import json #required for reading various JSON attributes from the content
 import requests #required for fetching the raw messages
@@ -119,7 +119,7 @@ def archive_message(groupName, msgNumber, depth=0):
 		)
 		print('\nProblem with Connection')
 		print(''.join(tbe.format_exception_only()))
-        print('\nSleeping 5 minutes to sidestep throttling/error')
+		print('\nSleeping 5 minutes to sidestep throttling/error')
 		time.sleep(300)
 
 
